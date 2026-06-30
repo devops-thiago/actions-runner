@@ -1,0 +1,24 @@
+services:
+  runner:
+    build:
+      context: .
+      args:
+        RUNNER_VERSION: ${RUNNER_VERSION:-2.334.0}
+        RUNNER_ARCH: ${RUNNER_ARCH:-x64}
+    environment:
+      GH_TOKEN: ${GH_TOKEN}
+      REPO_OWNER: ${REPO_OWNER}
+      REPO_NAME: ${REPO_NAME}
+      RUNNER_NAME_PREFIX: ${RUNNER_NAME_PREFIX:-gh-runner}
+      RUNNER_LABELS: ${RUNNER_LABELS:-self-hosted,linux}
+      RUNNER_EPHEMERAL: ${RUNNER_EPHEMERAL:-false}
+    networks:
+      - root_proxy
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    deploy:
+      replicas: 10
+
+networks:
+  root_proxy:

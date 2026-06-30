@@ -1,0 +1,57 @@
+FROM ubuntu@sha256:53958ec7b67c2c9355df922dd08dbf0360611f8c3cdb656875e81873db9ffdba
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl=8.18.0-1ubuntu2.1 \
+      ca-certificates=20260601~26.04.1 \
+      gpg=2.4.8-4ubuntu3 \
+      dirmngr=2.4.8-4ubuntu3 \
+      git=1:2.53.0-1ubuntu1 \
+      unzip=6.0-29ubuntu1 \
+      zip=3.0-15ubuntu3 \
+      wget=1.25.0-2ubuntu4 \
+      jq=1.8.1-4ubuntu2 \
+      tar=1.35+dfsg-4ubuntu0.1 \
+      sudo=1.9.17p2-1ubuntu3 \
+      software-properties-common=0.120 \
+      openssh-client=1:10.2p1-2ubuntu3.2 \
+      pkg-config=2.5.1-4 \
+      libssl-dev=3.5.5-1ubuntu3.2 \
+      gcc=4:15.2.0-5ubuntu1 \
+      g++=4:15.2.0-5ubuntu1 \
+      make=4.4.1-3 \
+      build-essential=12.12ubuntu2.26.04.1 \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ARG RUNNER_VERSION=2.334.0
+ARG RUNNER_ARCH=x64
+
+RUN useradd -m runner
+WORKDIR /home/runner/actions-runner
+
+RUN set -eux && \
+    RUNNER_FILE="actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
+    curl -fsSL -o "${RUNNER_FILE}" \
+      "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_FILE}" && \
+    EXPECTED_SHA=$(curl -fsSL \
+      "https://api.github.com/repos/actions/runner/releases/tags/v${RUNNER_VERSION}" \
+      | jq -r '.body' \
+      | grep "${RUNNER_FILE}" \
+      | grep -oE '[a-f0-9]{64}' \
+      | head -1) && \
+    test -n "${EXPECTED_SHA}" && \
+    echo "${EXPECTED_SHA}  ${RUNNER_FILE}" | sha256sum -c && \
+    tar xzf "${RUNNER_FILE}" && \
+    rm "${RUNNER_FILE}" && \
+    ./bin/installdependencies.sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    chown -R runner:runner /home/runner
+
+COPY --chown=runner:runner entrypoint.sh .
+
+USER runner
+
+ENTRYPOINT ["./entrypoint.sh"]
