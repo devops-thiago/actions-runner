@@ -1,3 +1,4 @@
+# ubuntu 26.04
 FROM ubuntu@sha256:53958ec7b67c2c9355df922dd08dbf0360611f8c3cdb656875e81873db9ffdba
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -26,12 +27,16 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG RUNNER_VERSION=2.334.0
-ARG RUNNER_ARCH=x64
 
 RUN useradd -m runner
 WORKDIR /home/runner/actions-runner
 
 RUN set -eux && \
+    case "$(uname -m)" in \
+      x86_64)  RUNNER_ARCH=x64 ;; \
+      aarch64) RUNNER_ARCH=arm64 ;; \
+      *)       echo "Unsupported arch: $(uname -m)"; exit 1 ;; \
+    esac && \
     RUNNER_FILE="actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
     curl -fsSL -o "${RUNNER_FILE}" \
       "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_FILE}" && \

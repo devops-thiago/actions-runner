@@ -3,7 +3,7 @@
 [![CI](https://github.com/devops-thiago/actions-runner/actions/workflows/ci.yml/badge.svg)](https://github.com/devops-thiago/actions-runner/actions/workflows/ci.yml)
 [![Release](https://github.com/devops-thiago/actions-runner/actions/workflows/release.yml/badge.svg)](https://github.com/devops-thiago/actions-runner/actions/workflows/release.yml)
 
-Dockerized, self-hosted GitHub Actions runner. Multi-arch (`amd64`, `arm64`, `arm/v7`), signed, and published to GHCR.
+Dockerized, self-hosted GitHub Actions runner. Multi-arch (`amd64`, `arm64`), signed, and published to GHCR.
 
 ## Quick Start
 
