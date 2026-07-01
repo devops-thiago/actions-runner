@@ -5,7 +5,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      curl=8.18.0-1ubuntu2.1 \
+      curl=8.18.0-1ubuntu2.2 \
       ca-certificates=20260601~26.04.1 \
       gpg=2.4.8-4ubuntu3 \
       dirmngr=2.4.8-4ubuntu3 \
