@@ -26,7 +26,7 @@ RUN apt-get update && \
       build-essential=12.12ubuntu2.26.04.1 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG RUNNER_VERSION=2.334.0
+ARG RUNNER_VERSION=2.335.1
 
 RUN useradd -m runner
 WORKDIR /home/runner/actions-runner
@@ -50,7 +50,7 @@ RUN set -eux && \
     echo "${EXPECTED_SHA}  ${RUNNER_FILE}" | sha256sum -c && \
     tar xzf "${RUNNER_FILE}" && \
     rm "${RUNNER_FILE}" && \
-    ./bin/installdependencies.sh && \
+    bash ./bin/installdependencies.sh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     chown -R runner:runner /home/runner
