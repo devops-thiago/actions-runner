@@ -5,7 +5,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      curl=8.18.0-1ubuntu2.2 \
+      curl=8.18.0-1ubuntu2.3 \
       ca-certificates=20260601~26.04.1 \
       gpg=2.4.8-4ubuntu3 \
       dirmngr=2.4.8-4ubuntu3 \
@@ -14,9 +14,9 @@ RUN apt-get update && \
       zip=3.0-15ubuntu3 \
       wget=1.25.0-2ubuntu4 \
       jq=1.8.1-4ubuntu2 \
-      tar=1.35+dfsg-4ubuntu0.1 \
+      tar=1.35+dfsg-4ubuntu0.2 \
       sudo=1.9.17p2-1ubuntu3 \
-      software-properties-common=0.120 \
+      software-properties-common=0.120.1 \
       openssh-client=1:10.2p1-2ubuntu3.2 \
       pkg-config=2.5.1-4 \
       libssl-dev=3.5.5-1ubuntu3.2 \
