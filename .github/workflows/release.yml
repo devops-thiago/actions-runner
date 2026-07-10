@@ -120,6 +120,8 @@ jobs:
           image-ref: ${{ needs.build-push.outputs.image }}@${{ needs.build-push.outputs.digest }}
           format: sarif
           output: trivy-results.sarif
+          exit-code: "1"
+          ignore-unfixed: true
           severity: CRITICAL,HIGH
           trivy-version: v0.72.0
 

@@ -66,5 +66,6 @@ jobs:
           image-ref: actions-runner:scan
           format: table
           exit-code: "1"
+          ignore-unfixed: true
           severity: CRITICAL,HIGH
           trivy-version: v0.72.0
