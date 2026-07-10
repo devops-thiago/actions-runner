@@ -1,0 +1,12 @@
+.git
+.github
+.gitignore
+.dockerignore
+
+.env
+.env.*
+
+*.md
+LICENSE
+SECURITY.md
+docker-compose.yml

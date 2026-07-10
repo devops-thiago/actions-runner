@@ -60,11 +60,16 @@ jobs:
       # after the March 2026 supply chain attack (CVE-2026-33634) where 76/77
       # tags were force-pushed to credential-stealing malware. Only the binary
       # versions v0.69.4-v0.69.6 were compromised; v0.70.0+ are all safe.
+      # Fail only on OS packages with a published fix. Runner-bundled Node deps and
+      # base-image gobinaries (e.g. pebble) often show Status=fixed upstream but
+      # cannot be patched here until actions/runner or Ubuntu ships an update.
       - name: Trivy vulnerability scan
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           image-ref: actions-runner:scan
           format: table
           exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os
           severity: CRITICAL,HIGH
           trivy-version: v0.72.0

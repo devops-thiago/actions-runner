@@ -1,0 +1,86 @@
+name: Bump runner version
+
+on:
+  schedule:
+    # Daily 06:00 UTC — catch new actions/runner releases
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bump-runner
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve versions
+        id: versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current=$(grep -E '^ARG RUNNER_VERSION=' Dockerfile | cut -d= -f2)
+          echo "current=${current}" >> "$GITHUB_OUTPUT"
+
+          # Max semver among non-prerelease, non-draft releases (not publish-date order)
+          latest=$(gh api "repos/actions/runner/releases?per_page=50" \
+            --jq '[.[] | select(.prerelease == false and .draft == false) | .tag_name | ltrimstr("v")]
+                  | max_by(split(".") | map(tonumber))')
+
+          if [ -z "${latest}" ] || [ "${latest}" = "null" ]; then
+            echo "ERROR: failed to resolve latest actions/runner version"
+            exit 1
+          fi
+
+          echo "latest=${latest}" >> "$GITHUB_OUTPUT"
+          echo "Current: ${current}  Upstream max stable: ${latest}"
+
+          newer=$(printf '%s\n%s\n' "${current}" "${latest}" \
+            | sort -t. -k1,1n -k2,2n -k3,3n \
+            | tail -1)
+
+          if [ "${newer}" = "${current}" ]; then
+            echo "bump=false" >> "$GITHUB_OUTPUT"
+            echo "Already on latest stable (${current})"
+          else
+            echo "bump=true" >> "$GITHUB_OUTPUT"
+            echo "Will bump ${current} -> ${latest}"
+          fi
+
+      - name: Bump version files, commit, and tag
+        if: steps.versions.outputs.bump == 'true'
+        env:
+          VERSION: ${{ steps.versions.outputs.latest }}
+        run: |
+          set -euo pipefail
+
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists — skipping"
+            exit 0
+          fi
+
+          sed -i "s/^ARG RUNNER_VERSION=.*/ARG RUNNER_VERSION=${VERSION}/" Dockerfile
+          sed -i "s|\(RUNNER_VERSION: \${RUNNER_VERSION:-\)[^}]*}|\1${VERSION}}|" docker-compose.yml
+          sed -i "s/^RUNNER_VERSION=.*/RUNNER_VERSION=${VERSION}/" .env.example
+          sed -i "s/| \`RUNNER_VERSION\` | No | \`[0-9.]*\` |/| \`RUNNER_VERSION\` | No | \`${VERSION}\` |/" README.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add Dockerfile docker-compose.yml .env.example README.md
+          git commit -m "feat: bump runner to v${VERSION}"
+
+          git tag "v${VERSION}"
+
+          git push origin HEAD:main
+          git push origin "v${VERSION}"
