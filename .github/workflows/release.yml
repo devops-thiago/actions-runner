@@ -1,10 +1,10 @@
 name: Release
 
+# Publishes images only when bump-runner (or a human) pushes a v* tag
+# matching an actions/runner release. Pushes to main must not release.
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-
 
 env:
   REGISTRY: ghcr.io
@@ -42,11 +42,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=sha-
-            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=raw,value=latest
+            type=sha,prefix=sha-
 
       - name: Build and push
         id: build
@@ -113,24 +112,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      # aquasecurity/trivy-action v0.35.0: known-safe after CVE-2026-33634
       # OS-only + ignore-unfixed: gate on fixable distro packages we can pin.
+      # Use table format (same as CI); SARIF was including all severities and
+      # failing the gate. trivy-action v0.36+ takes `version`, not trivy-version.
       - name: Trivy vulnerability scan
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ needs.build-push.outputs.image }}@${{ needs.build-push.outputs.digest }}
-          format: sarif
-          output: trivy-results.sarif
+          format: table
           exit-code: "1"
           ignore-unfixed: true
           vuln-type: os
           severity: CRITICAL,HIGH
-          trivy-version: v0.72.0
+          version: v0.72.0
 
   github-release:
     runs-on: ubuntu-latest
     needs: [sign, attest, scan]
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:

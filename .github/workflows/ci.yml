@@ -72,4 +72,4 @@ jobs:
           ignore-unfixed: true
           vuln-type: os
           severity: CRITICAL,HIGH
-          trivy-version: v0.72.0
+          version: v0.72.0
