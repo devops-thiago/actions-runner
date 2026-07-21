@@ -26,7 +26,7 @@ RUN apt-get update && \
       build-essential=12.12ubuntu2.26.04.1 \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG RUNNER_VERSION=2.335.1
+ARG RUNNER_VERSION=2.336.0
 
 RUN useradd -m runner
 WORKDIR /home/runner/actions-runner

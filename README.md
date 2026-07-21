@@ -20,7 +20,7 @@ cp .env.example .env
 | `GH_TOKEN` | Yes | — | GitHub PAT with `repo` and `admin:org` scopes |
 | `REPO_OWNER` | Yes | — | GitHub repository owner |
 | `REPO_NAME` | Yes | — | GitHub repository name |
-| `RUNNER_VERSION` | No | `2.335.1` | Actions runner version |
+| `RUNNER_VERSION` | No | `2.336.0` | Actions runner version |
 | `RUNNER_NAME_PREFIX` | No | `gh-runner` | Runner name prefix (suffixed with container hostname) |
 | `RUNNER_LABELS` | No | `self-hosted,linux` | Comma-separated runner labels |
 | `RUNNER_EPHEMERAL` | No | `false` | Set to `true` for single-job ephemeral runners |

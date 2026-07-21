@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        RUNNER_VERSION: ${RUNNER_VERSION:-2.335.1}
+        RUNNER_VERSION: ${RUNNER_VERSION:-2.336.0}
     environment:
       GH_TOKEN: ${GH_TOKEN}
       REPO_OWNER: ${REPO_OWNER}
