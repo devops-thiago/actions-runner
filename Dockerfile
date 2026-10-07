@@ -1,5 +1,5 @@
 # ubuntu 26.04
-FROM ubuntu@sha256:b7f48194d4d8b763a478a621cdc81c27be222ba2206ca3ca6bc42b49685f3d9e
+FROM ubuntu@sha256:f144425ff09be612d6d9ad965196e9cdc23dae1f42110a8a11a3e9a8198759f7
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
